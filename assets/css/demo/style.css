@@ -23141,6 +23141,10 @@ address p {
   grid-column-end: span 5;
 }
 
+.intro {
+  border-left: 1px solid red;
+}
+
 .table tbody tr:hover {
   font-size: 14px;
   font-weight: 500;
