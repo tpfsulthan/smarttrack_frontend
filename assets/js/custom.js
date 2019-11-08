@@ -1,7 +1,7 @@
 $(document).ready(function () {
   // var baseUrl = "http://localhost:3000/";
 
-  var baseUrl = "http://172.16.4.26:3000/";
+  var baseUrl = "http://smart-track-be.herokuapp.com/";
   initDashboard();
 
 
@@ -14,7 +14,7 @@ $(document).ready(function () {
       callcalcRoute();
     }
   
-  }, 20000);
+  }, 60000);
 
   var equipment,style,geojson;
   getNotification();
