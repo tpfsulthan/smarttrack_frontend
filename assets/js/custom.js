@@ -131,7 +131,7 @@ function calcRoute(start, end, FromRes, icon, item) {
 ];
 
   var directionsDisplay = new google.maps.DirectionsRenderer({
-    draggable: true,
+    draggable: false,
     map: map,
     polylineOptions: {
       strokeColor: RouteColor[item],
@@ -152,9 +152,9 @@ function calcRoute(start, end, FromRes, icon, item) {
   objRoute.Direction = directionsDisplay;
   Routes.push(objRoute);
 
-  google.maps.event.addListener(directionsDisplay, 'directions_changed', function (e) {
-    ShowPolyLine(directionsDisplay.getDirections(), directionsDisplay.markerOptions.title);
-  });
+  // google.maps.event.addListener(directionsDisplay, 'directions_changed', function (e) {
+  //   ShowPolyLine(directionsDisplay.getDirections(), directionsDisplay.markerOptions.title);
+  // });
 
   
   var request = {
