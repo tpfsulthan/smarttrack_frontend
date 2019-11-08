@@ -14,7 +14,7 @@ $(document).ready(function () {
       callcalcRoute();
     }
   
-  }, 5000);
+  }, 20000);
 
   var equipment,style,geojson;
   getNotification();
