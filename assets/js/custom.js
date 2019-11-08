@@ -1,24 +1,19 @@
 $(document).ready(function () {
-  // var baseUrl = "http://localhost:3000/";
-
   var baseUrl = "https://smart-track-be.herokuapp.com/";
   initDashboard();
 
-
-
   getMaster();
   var flightClicked = 0;
-  setInterval(function () {
-    getMaster();
-    if (flightClicked == 1) {
-      callcalcRoute();
-    }
+  // setInterval(function () {
+  //   getMaster();
+  //   if (1 == 1) {
+  //     //callcalcRoute();
+  //   }
 
-  }, 60000);
+  // }, 10000);
 
   var equipment, style, geojson;
   getNotification();
-
   // Basic functions
   function initDashboard() {
     httpGet('ping', function (result) {
@@ -26,11 +21,10 @@ $(document).ready(function () {
     });
   }
 
-
-
   function getMaster() {
     httpGet('getMaster', function (result) {
       //flight 
+      console.log(result)
       $(".dashboard-table > tbody").html("");
       var flight = result.data.flight;
       for (let index = 0; index < flight.length; index++) {
@@ -42,7 +36,9 @@ $(document).ready(function () {
       geojson = result.data.geojson;
       console.log(geojson);
       initMap();
+      callcalcRoute();
     });
+
     httpGet('getBay', function (result) {
 
     });
@@ -71,20 +67,15 @@ $(document).ready(function () {
   //  $(document).on("click",".bayId",function() {
   $(".dashboard-table").click(function () {
     flightClicked = 1;
-    //  alert('hii')
-    
-
     callcalcRoute();
-
   });
 
 
   function callcalcRoute() {
     for (i = 0; i < equipment.length; i++) {
-      //calcRoute("12.9801,80.2184", "12.9490,80.1828", '');
       var src = '"' + equipment[i].lat + ',' + equipment[i].lng + '"';
       var des = '"' + geojson.features[0].geometry.coordinates[0][0][1] + ',' + geojson.features[0].geometry.coordinates[0][0][0] + '"';
-      calcRoute(src, des, 'Root1', "assets/icons/" + equipment[i].icon, i);
+      calcRoute(src, des,'', "assets/icons/" + equipment[i].icon, i);
     }
   }
 
@@ -96,7 +87,7 @@ $(document).ready(function () {
       disableDefaultUI: true,
       center: new google.maps.LatLng(12.949152, 80.185317),
       styles: style,
-      center: new google.maps.LatLng(12.9490, 80.1828),
+      //  center: new google.maps.LatLng(12.9490, 80.1828),
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("map"), myOptions);
@@ -104,9 +95,9 @@ $(document).ready(function () {
     var marker, i;
     map.data.loadGeoJson(baseUrl + "geojson.json");
   }
-
-
 });
+
+
 //end of doc ready
 var map;
 var RouteCoordinates = [];
@@ -127,11 +118,10 @@ function calcRoute(start, end, FromRes, icon, item) {
       break;
     }
   }
-  //alert(RouteColor[item]);
 
 
   var directionsDisplay = new google.maps.DirectionsRenderer({
-    draggable: false,
+    draggable: true,
     map: map,
     polylineOptions: {
       strokeColor: RouteColor[item],
