@@ -1,7 +1,7 @@
 $(document).ready(function () {
   // var baseUrl = "http://localhost:3000/";
 
-  var baseUrl = "http://smart-track-be.herokuapp.com/";
+  var baseUrl = "https://smart-track-be.herokuapp.com/";
   initDashboard();
 
 
