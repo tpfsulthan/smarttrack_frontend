@@ -59,7 +59,7 @@
                       <i class="mdi mdi-settings-outline text-primary"></i>
                     </div>
                     <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <a href="index.html" class="item-subject font-weight-normal">
+                      <a href="index.php" class="item-subject font-weight-normal">
                         Logout
                       </a>
                     </div>
