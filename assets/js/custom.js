@@ -2,16 +2,9 @@ $(document).ready(function () {
   var baseUrl = "https://smart-track-be.herokuapp.com/";
   initDashboard();
 
-  getMaster();
+  getMaster("init");
   var flightClicked = 0;
-  // setInterval(function () {
-  //   getMaster();
-  //   if (1 == 1) {
-  //     //callcalcRoute();
-  //   }
-
-  // }, 10000);
-
+  
   var equipment, style, geojson;
   getNotification();
   // Basic functions
@@ -21,7 +14,7 @@ $(document).ready(function () {
     });
   }
 
-  function getMaster() {
+  function getMaster(value) {
     httpGet('getMaster', function (result) {
       //flight 
       console.log(result)
@@ -31,11 +24,21 @@ $(document).ready(function () {
         const element = flight[index];
         $(".dashboard-table > tbody").append("<tr class='bayId'><td><div>" + element.name + "</div></td></tr>");
       };
+     
       equipment = result.data.equipment;
+      console.log(equipment)
       style = result.data.style;
       geojson = result.data.geojson;
       console.log(geojson);
-      initMap();
+      if (value == 'init') {
+        initMap();
+      } else {
+        if(JSON.stringify(equipment) != JSON.stringify(result.data.equipment)){
+          initMap();
+        }
+      }
+
+     
       callcalcRoute();
     });
 
@@ -61,6 +64,10 @@ $(document).ready(function () {
     });
   }
 
+  setInterval(() => {
+    getMaster('none');
+  }, 20000);
+
 
   // on click
 
@@ -73,9 +80,9 @@ $(document).ready(function () {
 
   function callcalcRoute() {
     for (i = 0; i < equipment.length; i++) {
-      var src = '"' + equipment[i].lat + ',' + equipment[i].lng + '"';
-      var des = '"' + geojson.features[0].geometry.coordinates[0][0][1] + ',' + geojson.features[0].geometry.coordinates[0][0][0] + '"';
-      calcRoute(src, des,'', "assets/icons/" + equipment[i].icon, i);
+      src = '"' + equipment[i].lat + ',' + equipment[i].lng + '"';
+      des = '"' + geojson.features[0].geometry.coordinates[0][0][1] + ',' + geojson.features[0].geometry.coordinates[0][0][0] + '"';
+      calcRoute(src, des, '', "assets/icons/" + equipment[i].icon, i);
     }
   }
 
@@ -87,7 +94,6 @@ $(document).ready(function () {
       disableDefaultUI: true,
       center: new google.maps.LatLng(12.949152, 80.185317),
       styles: style,
-      //  center: new google.maps.LatLng(12.9490, 80.1828),
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("map"), myOptions);
@@ -119,9 +125,13 @@ function calcRoute(start, end, FromRes, icon, item) {
     }
   }
 
+  var RouteColor = ["#0094ff", "#479f67", "#3c9a94", "#a17b4b",
+  "#4ad98a", "#50cfe1", "#8ad3a4", "#40cbf1",
+  "#5ecf98", "#17c31f"
+];
 
   var directionsDisplay = new google.maps.DirectionsRenderer({
-    draggable: false,
+    draggable: true,
     map: map,
     polylineOptions: {
       strokeColor: RouteColor[item],
@@ -141,9 +151,12 @@ function calcRoute(start, end, FromRes, icon, item) {
   objRoute.OffSetCnt = 0;
   objRoute.Direction = directionsDisplay;
   Routes.push(objRoute);
+
   google.maps.event.addListener(directionsDisplay, 'directions_changed', function (e) {
     ShowPolyLine(directionsDisplay.getDirections(), directionsDisplay.markerOptions.title);
   });
+
+  
   var request = {
     origin: start,
     destination: end,
@@ -163,31 +176,39 @@ function ShowPolyLine(result, Title) {
   for (var i = 0; i < result.routes[0].overview_path.length; i++) {
     RouteCoordinates.push(new google.maps.LatLng(result.routes[0].overview_path[i].lat(), result.routes[0].overview_path[i].lng()))
   }
+
+
   var Filter = $(Routes).filter(function () {
     return this.Title == Title;
   })
-  var lineSymbol = {
-    scale: 3,
-    fillColor: '#FF0000',
-    fillOpacity: 0.7,
-    strokeOpacity: 0.7,
-    strokeWeight: 4
-  };
-  Filter[0].PolyLine = new google.maps.Polyline({
-    map: map,
-    path: RouteCoordinates,
-    icons: [{
-      icon: lineSymbol,
-      offset: '100%'
-    }],
-    geodesic: true,
-    strokeColor: "#0094ff",
-    strokeOpacity: 1.0,
-    strokeWeight: 5
-  });
-}
 
-var RouteColor = ["#0094ff", "#479f67", "#3c9a94", "#a17b4b",
-  "#4ad98a", "#50cfe1", "#8ad3a4", "#40cbf1",
-  "#5ecf98", "#17c31f"
-];
+  if (Filter.length > 0) {
+    var lineSymbol = {
+      scale: 3,
+      fillColor: '#FF0000',
+      fillOpacity: 0.7,
+      strokeOpacity: 0.7,
+      strokeWeight: 4
+    };
+
+
+    if (Filter[0].PolyLine != null || Filter[0].PolyLine != undefined) {
+      Filter[0].PolyLine.setPath(RouteCoordinates);
+      clearInterval(Filter[0].Interval);
+    } else {
+      Filter[0].PolyLine = new google.maps.Polyline({
+        map: map,
+        path: RouteCoordinates,
+        icons: [{
+          icon: lineSymbol,
+          offset: '100%'
+        }],
+        geodesic: true,
+        strokeColor: "#0094ff",
+        strokeOpacity: 1.0,
+        strokeWeight: 5
+      });
+    }
+
+  }
+}
