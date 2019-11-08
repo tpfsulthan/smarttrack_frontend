@@ -121,7 +121,7 @@ function calcRoute(start, end, FromRes, icon, item) {
 
 
   var directionsDisplay = new google.maps.DirectionsRenderer({
-    draggable: true,
+    draggable: false,
     map: map,
     polylineOptions: {
       strokeColor: RouteColor[item],
